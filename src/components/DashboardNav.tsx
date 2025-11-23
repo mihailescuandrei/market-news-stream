@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const DashboardNav = () => {
   const features = [
     {
-      title: "News Feed",
+      title: "News Feed - Alphavantage",
       description: "Real-time stock market news with sentiment analysis from Alpha Vantage",
       icon: Newspaper,
       href: "/newsfeed",

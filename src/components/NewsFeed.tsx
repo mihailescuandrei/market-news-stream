@@ -2,37 +2,31 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { NewsCard } from "./NewsCard";
 import { NewsResponse } from "@/types/news";
-import { Loader2, RefreshCw, AlertCircle, Info } from "lucide-react";
+import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-// Get your free API key at: https://www.alphavantage.co/support/#api-key
-const ALPHA_VANTAGE_API_KEY = "demo";
+import { supabase } from "@/integrations/supabase/client";
 
 const fetchNews = async (tickers?: string): Promise<NewsResponse> => {
-  const tickerParam = tickers ? `&tickers=${tickers}` : "";
-  const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT${tickerParam}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+  console.log("Fetching news via edge function...");
   
-  console.log("Fetching news from:", url);
+  const params = tickers ? { tickers } : {};
   
-  const response = await fetch(url);
+  const { data, error } = await supabase.functions.invoke('fetch-news', {
+    body: params,
+  });
   
-  if (!response.ok) {
-    throw new Error("Failed to fetch news");
+  if (error) {
+    console.error("Edge function error:", error);
+    throw new Error(error.message || "Failed to fetch news");
   }
   
-  const data = await response.json();
-  console.log("API Response:", data);
-  
-  if (data.Note) {
-    throw new Error("API rate limit reached. Please try again later or use your own API key.");
+  if (data.error) {
+    throw new Error(data.error);
   }
   
-  if (data.Information) {
-    throw new Error(data.Information);
-  }
+  console.log("Successfully fetched news:", data.feed?.length || 0, "articles");
   
   return data;
 };
@@ -68,24 +62,6 @@ export const NewsFeed = () => {
 
   return (
     <div className="space-y-6">
-      <Alert className="border-primary/50 bg-card">
-        <Info className="h-4 w-4" />
-        <AlertTitle>Using Demo API Key</AlertTitle>
-        <AlertDescription>
-          This app uses Alpha Vantage's demo API key which has rate limits. 
-          Get your free API key at{" "}
-          <a 
-            href="https://www.alphavantage.co/support/#api-key" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            alphavantage.co
-          </a>
-          {" "}and replace it in the code for unlimited access.
-        </AlertDescription>
-      </Alert>
-
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 flex gap-2">
           <Input

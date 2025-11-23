@@ -1,73 +1,95 @@
-# Welcome to your Lovable project
+# Market Intelligence - Stock News Feed
 
-## Project info
+A professional real-time stock market news feed dashboard powered by Alpha Vantage API.
 
-**URL**: https://lovable.dev/projects/c974d832-c829-4a05-aa9f-c8284eca0fa5
+## Features
 
-## How can I edit this code?
+- 📊 Real-time stock market news streaming
+- 📈 Sentiment analysis with visual indicators (bullish/bearish)
+- 🔍 Filter news by ticker symbols
+- 🔄 Auto-refresh functionality (60-second intervals)
+- 🎨 Professional financial dashboard design
+- 📱 Fully responsive layout
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c974d832-c829-4a05-aa9f-c8284eca0fa5) and start prompting.
+- Node.js & npm installed ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- Alpha Vantage API key (get your free key at [alphavantage.co](https://www.alphavantage.co/support/#api-key))
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Get your free API key from [Alpha Vantage](https://www.alphavantage.co/support/#api-key)
+2. Open `src/components/NewsFeed.tsx`
+3. Replace the demo API key:
+   ```typescript
+   const ALPHA_VANTAGE_API_KEY = "YOUR_API_KEY_HERE";
+   ```
 
-**Use GitHub Codespaces**
+## Alpha Vantage API Integration
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This app uses the NEWS_SENTIMENT endpoint from Alpha Vantage:
 
-## What technologies are used for this project?
+**Endpoint:** `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey=YOUR_API_KEY`
 
-This project is built with:
+**Optional Parameters:**
+- `tickers`: Filter by stock symbols (e.g., `AAPL`, `TSLA`)
+- `topics`: Filter by news topics
+- `time_from` / `time_to`: Time range filters
+- `limit`: Number of results
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+[View full API documentation](https://www.alphavantage.co/documentation/#news-sentiment)
 
-## How can I deploy this project?
+## Technologies
 
-Simply open [Lovable](https://lovable.dev/projects/c974d832-c829-4a05-aa9f-c8284eca0fa5) and click on Share -> Publish.
+- **Frontend:** React, TypeScript, Vite
+- **UI:** Tailwind CSS, shadcn/ui components
+- **Data Fetching:** TanStack Query (React Query)
+- **API:** Alpha Vantage NEWS_SENTIMENT
 
-## Can I connect a custom domain to my Lovable project?
+## Project Structure
 
-Yes, you can!
+```
+src/
+├── components/
+│   ├── DashboardHeader.tsx    # Main header component
+│   ├── NewsFeed.tsx           # News feed with API integration
+│   └── NewsCard.tsx           # Individual news article card
+├── types/
+│   └── news.ts                # TypeScript types for API responses
+└── pages/
+    └── Index.tsx              # Main dashboard page
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Deployment
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Simply open [Lovable](https://lovable.dev/projects/c974d832-c829-4a05-aa9f-c8284eca0fa5) and click on Share → Publish.
+
+## Next Steps
+
+- Add more ticker filtering options
+- Implement topic-based filtering
+- Add historical news archive
+- Create price charts integration
+- Build portfolio tracking features
+
+## License
+
+This project was built with [Lovable](https://lovable.dev)

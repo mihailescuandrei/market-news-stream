@@ -70,10 +70,10 @@ export const FinnhubNewsFeed = () => {
   useEffect(() => {
     fetchNews();
 
-    // Auto-refresh every 2 minutes
+    // Auto-refresh every 5 minutes to avoid rate limits
     const interval = setInterval(() => {
       fetchNews(true);
-    }, 120000);
+    }, 300000);
 
     return () => clearInterval(interval);
   }, []);
@@ -90,7 +90,7 @@ export const FinnhubNewsFeed = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <p className="text-sm text-muted-foreground">
-          {articles.length > 0 ? `Showing ${articles.length} articles • Auto-refreshes every 2 minutes` : 'Loading news...'}
+          {articles.length > 0 ? `Showing ${articles.length} articles • Auto-refreshes every 5 minutes` : 'Loading news...'}
         </p>
         <Button
           variant="outline"

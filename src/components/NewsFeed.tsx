@@ -52,7 +52,7 @@ export const NewsFeed = () => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["news", searchTicker],
     queryFn: () => fetchNews(searchTicker),
-    refetchInterval: autoRefresh ? 60000 : false,
+    refetchInterval: autoRefresh ? 300000 : false, // 5 minutes to avoid rate limits
     retry: 1,
     refetchOnMount: true,
     refetchOnWindowFocus: false,

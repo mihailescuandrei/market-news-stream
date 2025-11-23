@@ -21,6 +21,14 @@ export const DashboardNav = () => {
       bgColor: "bg-primary/10",
     },
     {
+      title: "News Feed - NewsData.io",
+      description: "Latest USA technology news from NewsData.io",
+      icon: Newspaper,
+      href: "/newsfeed-newsdata",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
       title: "Price Charts",
       description: "Coming soon - Interactive price charts and technical analysis",
       icon: BarChart3,

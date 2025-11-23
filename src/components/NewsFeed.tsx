@@ -13,22 +13,35 @@ const fetchNews = async (tickers?: string): Promise<NewsResponse> => {
   
   const params = tickers ? { tickers } : {};
   
-  const { data, error } = await supabase.functions.invoke('fetch-news', {
-    body: params,
-  });
-  
-  if (error) {
-    console.error("Edge function error:", error);
-    throw new Error(error.message || "Failed to fetch news");
+  try {
+    const { data, error } = await supabase.functions.invoke('fetch-news', {
+      body: params,
+    });
+    
+    console.log("Edge function response:", { data, error });
+    
+    if (error) {
+      console.error("Edge function error:", error);
+      throw new Error(error.message || "Failed to fetch news");
+    }
+    
+    if (data.error) {
+      console.error("Data contains error:", data.error);
+      throw new Error(data.error);
+    }
+    
+    if (!data.feed || data.feed.length === 0) {
+      console.warn("No feed data in response");
+      throw new Error("No news articles available");
+    }
+    
+    console.log("Successfully fetched news:", data.feed?.length || 0, "articles");
+    
+    return data;
+  } catch (err) {
+    console.error("Fetch error:", err);
+    throw err;
   }
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
-  
-  console.log("Successfully fetched news:", data.feed?.length || 0, "articles");
-  
-  return data;
 };
 
 export const NewsFeed = () => {
@@ -39,8 +52,10 @@ export const NewsFeed = () => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["news", searchTicker],
     queryFn: () => fetchNews(searchTicker),
-    refetchInterval: autoRefresh ? 60000 : false, // Refresh every 60 seconds if enabled
+    refetchInterval: autoRefresh ? 60000 : false,
     retry: 1,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

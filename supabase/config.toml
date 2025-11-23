@@ -1,1 +1,4 @@
 project_id = "tekamzesntntcrsyjdjq"
+
+[functions.fetch-finnhub-news]
+verify_jwt = false

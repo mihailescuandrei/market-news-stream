@@ -13,6 +13,14 @@ export const DashboardNav = () => {
       bgColor: "bg-primary/10",
     },
     {
+      title: "News Feed - Finnhub",
+      description: "Market news and updates from Finnhub financial data provider",
+      icon: Newspaper,
+      href: "/newsfeed-finnhub",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
       title: "Price Charts",
       description: "Coming soon - Interactive price charts and technical analysis",
       icon: BarChart3,

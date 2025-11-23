@@ -1,10 +1,17 @@
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export const DashboardHeader = () => {
   return (
     <header className="border-b border-border bg-card">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </Button>
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
             <TrendingUp className="w-6 h-6 text-primary-foreground" />
           </div>

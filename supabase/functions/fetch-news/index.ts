@@ -75,12 +75,29 @@ serve(async (req) => {
       // Check for API errors - but only if there's no feed data
       if (data.Note && !data.feed) {
         console.error('Alpha Vantage rate limit:', data.Note);
-        throw new Error('API rate limit reached. Please wait a moment and try again.');
+        // Gracefully handle rate limiting without throwing a 500
+        return new Response(
+          JSON.stringify({
+            error: 'API rate limit reached. Please wait a moment and try again.',
+            code: 'RATE_LIMITED',
+            note: data.Note,
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
       }
       
       if (data.Information && !data.feed) {
-        console.error('Alpha Vantage info message:', data.Information);
-        throw new Error(data.Information);
+        console.error('Alpha Vantage info message (no feed):', data.Information);
+        return new Response(
+          JSON.stringify({ error: data.Information }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
       }
       
       // Log any warnings but continue if we have data
@@ -90,9 +107,19 @@ serve(async (req) => {
       
       console.log('Successfully fetched news articles:', data.feed?.length || 0);
       
-      // Return error if no feed data
+      // If no feed data, return an empty feed instead of a 500 error
       if (!data.feed || data.feed.length === 0) {
-        throw new Error('No news articles returned from Alpha Vantage');
+        console.warn('No news articles returned from Alpha Vantage');
+        return new Response(
+          JSON.stringify({
+            error: 'No news articles returned from Alpha Vantage',
+            feed: [],
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
       }
       
       return new Response(

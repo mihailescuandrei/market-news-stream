@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { NewsCard } from "./NewsCard";
 import { NewsResponse } from "@/types/news";
-import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
+import { Loader2, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -161,11 +161,75 @@ export const NewsFeed = () => {
           </div>
         </div>
       ) : (
-        <div className="grid gap-2">
+        <div>
           {data?.feed && data.feed.length > 0 ? (
-            data.feed.map((article, index) => (
-              <NewsCard key={index} article={article} />
-            ))
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+              {/* Bullish Column */}
+              <div className="space-y-2">
+                <div className="bg-terminal-success/10 border-2 border-terminal-success p-2">
+                  <h2 className="text-terminal-success font-mono font-bold uppercase text-sm tracking-wider flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    BULLISH ({data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("bullish")).length})
+                  </h2>
+                </div>
+                <div className="space-y-2">
+                  {data.feed
+                    .filter(article => article.overall_sentiment_label.toLowerCase().includes("bullish"))
+                    .map((article, index) => (
+                      <NewsCard key={`bullish-${index}`} article={article} />
+                    ))}
+                  {data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("bullish")).length === 0 && (
+                    <div className="bg-terminal-panel border-2 border-terminal-border p-4 text-center">
+                      <p className="text-terminal-text/50 font-mono text-xs">NO BULLISH NEWS</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Neutral Column */}
+              <div className="space-y-2">
+                <div className="bg-terminal-text/10 border-2 border-terminal-text p-2">
+                  <h2 className="text-terminal-text font-mono font-bold uppercase text-sm tracking-wider flex items-center gap-2">
+                    <Minus className="w-4 h-4" />
+                    NEUTRAL ({data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("neutral")).length})
+                  </h2>
+                </div>
+                <div className="space-y-2">
+                  {data.feed
+                    .filter(article => article.overall_sentiment_label.toLowerCase().includes("neutral"))
+                    .map((article, index) => (
+                      <NewsCard key={`neutral-${index}`} article={article} />
+                    ))}
+                  {data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("neutral")).length === 0 && (
+                    <div className="bg-terminal-panel border-2 border-terminal-border p-4 text-center">
+                      <p className="text-terminal-text/50 font-mono text-xs">NO NEUTRAL NEWS</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bearish Column */}
+              <div className="space-y-2">
+                <div className="bg-terminal-danger/10 border-2 border-terminal-danger p-2">
+                  <h2 className="text-terminal-danger font-mono font-bold uppercase text-sm tracking-wider flex items-center gap-2">
+                    <TrendingDown className="w-4 h-4" />
+                    BEARISH ({data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("bearish")).length})
+                  </h2>
+                </div>
+                <div className="space-y-2">
+                  {data.feed
+                    .filter(article => article.overall_sentiment_label.toLowerCase().includes("bearish"))
+                    .map((article, index) => (
+                      <NewsCard key={`bearish-${index}`} article={article} />
+                    ))}
+                  {data.feed.filter(a => a.overall_sentiment_label.toLowerCase().includes("bearish")).length === 0 && (
+                    <div className="bg-terminal-panel border-2 border-terminal-border p-4 text-center">
+                      <p className="text-terminal-text/50 font-mono text-xs">NO BEARISH NEWS</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="text-center py-20 bg-terminal-panel border-2 border-terminal-border">
               <p className="text-lg text-terminal-text font-mono uppercase">NO DATA AVAILABLE</p>

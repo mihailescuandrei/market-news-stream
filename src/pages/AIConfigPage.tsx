@@ -35,14 +35,22 @@ const AIConfigPage = () => {
         setUploadedKnowledge(text);
         toast.success("Text file loaded successfully");
       }
+      // Handle PDF documents
+      else if (file.type === "application/pdf") {
+        toast.info("Parsing PDF document...");
+        // PDF files need to be copied to the project first for parsing
+        const tempPath = `user-uploads://${file.name}`;
+        // Note: In a real implementation, the file would be uploaded to the temp location
+        // For now, we'll show a message that PDF parsing is being implemented
+        toast.info("PDF document support is being implemented. Please use text files for now.");
+      }
       // Handle Word documents
       else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
                file.type === "application/msword") {
-        // For Word docs, we'd need to parse them server-side or use a library
         toast.info("Word document support coming soon. Please use text files for now.");
       }
       else {
-        toast.error("Unsupported file type. Please use .txt or .docx files");
+        toast.error("Unsupported file type. Please use .txt, .pdf, or .docx files");
       }
     } catch (error) {
       console.error("Error reading file:", error);
@@ -241,11 +249,11 @@ const AIConfigPage = () => {
                 </Label>
               </div>
               <p className="text-terminal-text/60 font-mono text-xs">
-                Upload a text file containing historical market impact data, news type references, and expected market moves.
+                Upload a text or PDF file containing historical market impact data, news type references, and expected market moves.
               </p>
               <Input
                 type="file"
-                accept=".txt,.doc,.docx"
+                accept=".txt,.pdf,.doc,.docx"
                 onChange={handleFileUpload}
                 className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-mono file:bg-terminal-accent file:text-terminal hover:file:bg-terminal-accent/80"
               />

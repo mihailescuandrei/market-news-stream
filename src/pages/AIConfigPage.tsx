@@ -8,7 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Brain, Save } from "lucide-react";
+import { Brain, Save, Plus, Trash2, BookOpen } from "lucide-react";
+
+interface KnowledgeEntry {
+  id: string;
+  newsType: string;
+  historicalReference: string;
+  expectedMove: string;
+  timeframe: string;
+  additionalContext: string;
+}
 
 const AIConfigPage = () => {
   const [config, setConfig] = useState({
@@ -20,10 +29,52 @@ const AIConfigPage = () => {
     topP: 1,
   });
 
+  const [knowledge, setKnowledge] = useState<KnowledgeEntry[]>([
+    {
+      id: "1",
+      newsType: "Federal Reserve Rate Decision",
+      historicalReference: "Rate hikes typically cause -1.5% to -3% in S&P 500 within 24h",
+      expectedMove: "-1.5% to -3%",
+      timeframe: "24 hours",
+      additionalContext: "Tech sector sees larger impact (-2% to -4%). Financials may benefit slightly."
+    },
+    {
+      id: "2",
+      newsType: "Major Tech Earnings Beat",
+      historicalReference: "Strong FAANG earnings typically lift tech sector +2-3% and broader market +0.5-1%",
+      expectedMove: "+2% to +3% (sector), +0.5% to +1% (market)",
+      timeframe: "1-2 trading days",
+      additionalContext: "Impact amplified if accompanied by strong guidance. Watch for sector rotation."
+    }
+  ]);
+
+  const addKnowledgeEntry = () => {
+    const newEntry: KnowledgeEntry = {
+      id: Date.now().toString(),
+      newsType: "",
+      historicalReference: "",
+      expectedMove: "",
+      timeframe: "",
+      additionalContext: ""
+    };
+    setKnowledge([...knowledge, newEntry]);
+  };
+
+  const updateKnowledgeEntry = (id: string, field: keyof KnowledgeEntry, value: string) => {
+    setKnowledge(knowledge.map(entry => 
+      entry.id === id ? { ...entry, [field]: value } : entry
+    ));
+  };
+
+  const deleteKnowledgeEntry = (id: string) => {
+    setKnowledge(knowledge.filter(entry => entry.id !== id));
+  };
+
   const handleSave = () => {
     // TODO: Implement save to backend
-    toast.success("Configuration saved successfully");
+    toast.success("Configuration and knowledge saved successfully");
     console.log("Saved config:", config);
+    console.log("Saved knowledge:", knowledge);
   };
 
   return (
@@ -179,6 +230,126 @@ const AIConfigPage = () => {
                 SAVE CONFIGURATION
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Knowledge Base Section */}
+        <Card className="bg-terminal-panel border-2 border-terminal-border mt-6">
+          <CardHeader className="border-b-2 border-terminal-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded bg-terminal-success/20 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-terminal-success" />
+                </div>
+                <div>
+                  <CardTitle className="text-terminal-accent font-mono">
+                    AGENT KNOWLEDGE BASE
+                  </CardTitle>
+                  <CardDescription className="text-terminal-text/60 font-mono text-xs">
+                    Historical market impact data for different news types
+                  </CardDescription>
+                </div>
+              </div>
+              <Button
+                onClick={addKnowledgeEntry}
+                className="bg-terminal-success hover:bg-terminal-success/80 text-terminal font-mono font-semibold"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                ADD ENTRY
+              </Button>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-4 pt-6">
+            {knowledge.map((entry, index) => (
+              <div
+                key={entry.id}
+                className="p-4 bg-terminal border-2 border-terminal-border space-y-4"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-terminal-accent font-mono text-xs font-bold">
+                    ENTRY #{index + 1}
+                  </span>
+                  <Button
+                    onClick={() => deleteKnowledgeEntry(entry.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-terminal-danger hover:bg-terminal-danger/20"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-terminal-accent font-mono text-xs">
+                      NEWS TYPE / CATEGORY
+                    </Label>
+                    <Input
+                      value={entry.newsType}
+                      onChange={(e) => updateKnowledgeEntry(entry.id, "newsType", e.target.value)}
+                      placeholder="e.g., Federal Reserve Rate Decision"
+                      className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-terminal-accent font-mono text-xs">
+                      EXPECTED MOVE
+                    </Label>
+                    <Input
+                      value={entry.expectedMove}
+                      onChange={(e) => updateKnowledgeEntry(entry.id, "expectedMove", e.target.value)}
+                      placeholder="e.g., -1.5% to -3%"
+                      className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-terminal-accent font-mono text-xs">
+                      TIMEFRAME
+                    </Label>
+                    <Input
+                      value={entry.timeframe}
+                      onChange={(e) => updateKnowledgeEntry(entry.id, "timeframe", e.target.value)}
+                      placeholder="e.g., 24 hours"
+                      className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-terminal-accent font-mono text-xs">
+                      HISTORICAL REFERENCE
+                    </Label>
+                    <Textarea
+                      value={entry.historicalReference}
+                      onChange={(e) => updateKnowledgeEntry(entry.id, "historicalReference", e.target.value)}
+                      placeholder="e.g., Rate hikes typically cause -1.5% to -3% in S&P 500 within 24h"
+                      className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs min-h-[60px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-terminal-accent font-mono text-xs">
+                      ADDITIONAL CONTEXT
+                    </Label>
+                    <Textarea
+                      value={entry.additionalContext}
+                      onChange={(e) => updateKnowledgeEntry(entry.id, "additionalContext", e.target.value)}
+                      placeholder="e.g., Tech sector sees larger impact. Watch for sector rotation."
+                      className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs min-h-[60px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {knowledge.length === 0 && (
+              <div className="text-center py-12 text-terminal-text/60 font-mono text-sm">
+                No knowledge entries yet. Click "ADD ENTRY" to create one.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

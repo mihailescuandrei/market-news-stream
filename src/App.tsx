@@ -9,6 +9,7 @@ import FinnhubNewsFeedPage from "./pages/FinnhubNewsFeedPage";
 import NewsDataFeedPage from "./pages/NewsDataFeedPage";
 import AIConfigPage from "./pages/AIConfigPage";
 import AIAgentsLogsPage from "./pages/AIAgentsLogsPage";
+import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/newsfeed-newsdata" element={<NewsDataFeedPage />} />
           <Route path="/ai-config" element={<AIConfigPage />} />
           <Route path="/ai-logs" element={<AIAgentsLogsPage />} />
+          <Route path="/auth" element={<AuthPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -8,10 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Brain, Save, BookOpen, Upload } from "lucide-react";
+import { Brain, Save, BookOpen, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 
 const AIConfigPage = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [config, setConfig] = useState({
     agentName: "Market Impact Analyst",
     model: "gpt-4.1-mini-2025-04-14",
@@ -23,6 +30,31 @@ const AIConfigPage = () => {
 
   const [uploadedKnowledge, setUploadedKnowledge] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+      
+      if (!session) {
+        toast.error("Please sign in to access AI configuration");
+        navigate("/auth");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -89,6 +121,21 @@ const AIConfigPage = () => {
     console.log("Saved config:", config);
     console.log("Uploaded knowledge document:", uploadedKnowledge);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-terminal flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-terminal-accent animate-spin" />
+          <p className="text-terminal-text font-mono text-sm">LOADING...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !session) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-terminal">

@@ -1,4 +1,4 @@
-import { TrendingUp, BarChart3, Newspaper, Brain } from "lucide-react";
+import { TrendingUp, BarChart3, Newspaper, Brain, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -33,6 +33,14 @@ export const DashboardNav = () => {
       description: "Configure Market Impact Analyst agent with OpenAI",
       icon: Brain,
       href: "/ai-config",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
+      title: "AI Agents Logs",
+      description: "Monitor AI agent execution and view request/response logs",
+      icon: Activity,
+      href: "/ai-logs",
       color: "text-primary",
       bgColor: "bg-primary/10",
     },

@@ -2,7 +2,7 @@ import { ExternalLink, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NewsArticle } from "@/types/news";
-import { formatDistanceToNow } from "date-fns";
+import { format, addHours } from "date-fns";
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -46,8 +46,9 @@ export const NewsCard = ({ article }: NewsCardProps) => {
       const hour = dateString.substring(9, 11);
       const minute = dateString.substring(11, 13);
       
-      const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:00`);
-      return formatDistanceToNow(date, { addSuffix: true });
+      const utcDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
+      const gmt3Date = addHours(utcDate, 3);
+      return format(gmt3Date, "dd/MM/yyyy HH:mm") + " GMT+3";
     } catch (e) {
       return dateString;
     }

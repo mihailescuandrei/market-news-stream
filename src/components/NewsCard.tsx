@@ -47,8 +47,8 @@ export const NewsCard = ({ article }: NewsCardProps) => {
       const minute = dateString.substring(11, 13);
       
       const utcDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
-      const gmt3Date = addHours(utcDate, 3);
-      return format(gmt3Date, "dd/MM/yyyy HH:mm") + " GMT+3";
+      const gmt2Date = addHours(utcDate, 2);
+      return format(gmt2Date, "dd/MM/yyyy HH:mm") + " GMT+2";
     } catch (e) {
       return dateString;
     }

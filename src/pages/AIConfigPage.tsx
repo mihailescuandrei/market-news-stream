@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Brain, Save, BookOpen, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const AIConfigPage = () => {
   const [config, setConfig] = useState({
@@ -21,12 +22,14 @@ const AIConfigPage = () => {
   });
 
   const [uploadedKnowledge, setUploadedKnowledge] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
+      setIsUploading(true);
       toast.info("Processing file...");
       
       // Handle text files
@@ -39,20 +42,27 @@ const AIConfigPage = () => {
       else if (file.type === "application/pdf") {
         toast.info("Parsing PDF document... This may take a moment.");
         
-        // Create a temporary file path
-        const tempPath = `tmp://knowledge-upload-${Date.now()}.pdf`;
-        
-        // Create a File object and save to temp location
-        const arrayBuffer = await file.arrayBuffer();
-        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-        
-        // For browser file uploads, we'll use FormData to handle the file
-        // In a production environment, you would upload to storage
-        // For now, we'll notify that the file was received
-        toast.success("PDF file received. Full parsing will be implemented server-side.");
-        
-        // Placeholder text for PDF content
-        setUploadedKnowledge(`[PDF Document: ${file.name}]\n\nPDF parsing will extract the full text content here. This includes all historical market impact data, news type references, and expected market moves from your document.`);
+        // Create form data for the edge function
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Call the edge function to parse the PDF
+        const { data, error } = await supabase.functions.invoke('parse-knowledge-pdf', {
+          body: formData,
+        });
+
+        if (error) {
+          console.error('PDF parsing error:', error);
+          throw new Error(error.message || 'Failed to parse PDF');
+        }
+
+        if (data.success) {
+          setUploadedKnowledge(data.extractedText);
+          toast.success(`PDF parsed successfully! ${data.pageCount} pages extracted.`);
+          console.log('PDF stored at:', data.storagePath);
+        } else {
+          throw new Error(data.error || 'Failed to parse PDF');
+        }
       }
       // Handle Word documents
       else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
@@ -64,7 +74,12 @@ const AIConfigPage = () => {
       }
     } catch (error) {
       console.error("Error reading file:", error);
-      toast.error("Failed to read file");
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to read file: ${errorMessage}`);
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      event.target.value = '';
     }
   };
 
@@ -265,7 +280,8 @@ const AIConfigPage = () => {
                 type="file"
                 accept=".txt,.pdf,.doc,.docx"
                 onChange={handleFileUpload}
-                className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-mono file:bg-terminal-accent file:text-terminal hover:file:bg-terminal-accent/80"
+                disabled={isUploading}
+                className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-mono file:bg-terminal-accent file:text-terminal hover:file:bg-terminal-accent/80 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               
               {uploadedKnowledge && (

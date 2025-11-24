@@ -55,73 +55,51 @@ export const NewsCard = ({ article }: NewsCardProps) => {
 
   return (
     <div className="bg-terminal-panel border-2 border-terminal-border hover:border-terminal-accent transition-colors duration-200">
-      <div className="p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Left Column - Metadata */}
-          <div className="lg:col-span-2 space-y-2 border-r border-terminal-border/50 pr-4">
-            <div className="space-y-1">
-              <div className="text-[10px] text-terminal-text/60 font-mono uppercase tracking-wider">Source</div>
-              <div className="text-xs text-terminal-accent font-mono">{article.source}</div>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="text-[10px] text-terminal-text/60 font-mono uppercase tracking-wider">Published</div>
-              <div className="text-xs text-terminal-text font-mono">{formatDate(article.time_published)}</div>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="text-[10px] text-terminal-text/60 font-mono uppercase tracking-wider">Sentiment</div>
-              <div className={`flex items-center gap-1 ${getSentimentColor(article.overall_sentiment_score)}`}>
-                {getSentimentIcon(article.overall_sentiment_score)}
-                <span className="text-xs font-mono font-bold">
-                  {article.overall_sentiment_score.toFixed(3)}
-                </span>
-              </div>
-              <div className="mt-1">
-                {getSentimentBadge(article.overall_sentiment_label)}
-              </div>
-            </div>
+      <div className="p-3">
+        <div className="space-y-2">
+          {/* Header - Source and Time */}
+          <div className="flex items-center justify-between">
+            <div className="text-[10px] text-terminal-accent font-mono font-bold uppercase">{article.source}</div>
+            <div className="text-[10px] text-terminal-text font-mono">{formatDate(article.time_published)}</div>
           </div>
           
-          {/* Middle Column - Content */}
-          <div className="lg:col-span-7 space-y-3">
-            <a 
-              href={article.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="group"
-            >
-              <h3 className="text-base font-bold text-terminal-accent hover:text-terminal-accent/80 transition-colors leading-tight font-mono uppercase tracking-wide flex items-start gap-2">
-                {article.title}
-                <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
-              </h3>
-            </a>
-            
-            <p className="text-sm text-terminal-text leading-relaxed font-mono">
-              {article.summary}
-            </p>
+          {/* Title */}
+          <a 
+            href={article.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="group block"
+          >
+            <h3 className="text-sm font-bold text-terminal-accent hover:text-terminal-accent/80 transition-colors leading-tight font-mono flex items-start gap-2">
+              <span className="flex-1">{article.title}</span>
+              <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
+            </h3>
+          </a>
+          
+          {/* Sentiment Score */}
+          <div className="flex items-center justify-between pt-1 border-t border-terminal-border/50">
+            <div className={`flex items-center gap-1 ${getSentimentColor(article.overall_sentiment_score)}`}>
+              {getSentimentIcon(article.overall_sentiment_score)}
+              <span className="text-xs font-mono font-bold">
+                {article.overall_sentiment_score.toFixed(3)}
+              </span>
+            </div>
+            {getSentimentBadge(article.overall_sentiment_label)}
           </div>
           
-          {/* Right Column - Tickers */}
-          <div className="lg:col-span-3 border-l border-terminal-border/50 pl-4">
-            <div className="space-y-2">
-              <div className="text-[10px] text-terminal-text/60 font-mono uppercase tracking-wider">Related Tickers</div>
-              {article.ticker_sentiment && article.ticker_sentiment.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {article.ticker_sentiment.slice(0, 8).map((ticker, idx) => (
-                    <div 
-                      key={idx} 
-                      className="bg-terminal border border-terminal-border px-2 py-1 text-terminal-accent font-mono text-xs font-bold hover:border-terminal-accent transition-colors"
-                    >
-                      {ticker.ticker}
-                    </div>
-                  ))}
+          {/* Tickers */}
+          {article.ticker_sentiment && article.ticker_sentiment.length > 0 && (
+            <div className="flex flex-wrap gap-1 pt-2 border-t border-terminal-border/50">
+              {article.ticker_sentiment.slice(0, 5).map((ticker, idx) => (
+                <div 
+                  key={idx} 
+                  className="bg-terminal border border-terminal-border px-1.5 py-0.5 text-terminal-accent font-mono text-[10px] font-bold"
+                >
+                  {ticker.ticker}
                 </div>
-              ) : (
-                <div className="text-xs text-terminal-text/50 font-mono">N/A</div>
-              )}
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

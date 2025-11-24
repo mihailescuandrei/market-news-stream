@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Brain, Save, Plus, Trash2, BookOpen } from "lucide-react";
+import { Brain, Save, Plus, Trash2, BookOpen, Upload } from "lucide-react";
 
 interface KnowledgeEntry {
   id: string;
@@ -48,6 +48,36 @@ const AIConfigPage = () => {
     }
   ]);
 
+  const [uploadedKnowledge, setUploadedKnowledge] = useState<string>("");
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      toast.info("Processing file...");
+      
+      // Handle text files
+      if (file.type === "text/plain") {
+        const text = await file.text();
+        setUploadedKnowledge(text);
+        toast.success("Text file loaded successfully");
+      }
+      // Handle Word documents
+      else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+               file.type === "application/msword") {
+        // For Word docs, we'd need to parse them server-side or use a library
+        toast.info("Word document support coming soon. Please use text files for now.");
+      }
+      else {
+        toast.error("Unsupported file type. Please use .txt or .docx files");
+      }
+    } catch (error) {
+      console.error("Error reading file:", error);
+      toast.error("Failed to read file");
+    }
+  };
+
   const addKnowledgeEntry = () => {
     const newEntry: KnowledgeEntry = {
       id: Date.now().toString(),
@@ -75,6 +105,7 @@ const AIConfigPage = () => {
     toast.success("Configuration and knowledge saved successfully");
     console.log("Saved config:", config);
     console.log("Saved knowledge:", knowledge);
+    console.log("Uploaded knowledge document:", uploadedKnowledge);
   };
 
   return (
@@ -261,7 +292,61 @@ const AIConfigPage = () => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 pt-6">
+          <CardContent className="space-y-6 pt-6">
+            {/* File Upload Section */}
+            <div className="p-4 bg-terminal border-2 border-terminal-border space-y-3">
+              <div className="flex items-center gap-2">
+                <Upload className="w-4 h-4 text-terminal-success" />
+                <Label className="text-terminal-accent font-mono text-sm">
+                  UPLOAD KNOWLEDGE DOCUMENT
+                </Label>
+              </div>
+              <p className="text-terminal-text/60 font-mono text-xs">
+                Upload a text file containing historical market impact data, news type references, and expected market moves.
+              </p>
+              <Input
+                type="file"
+                accept=".txt,.doc,.docx"
+                onChange={handleFileUpload}
+                className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-mono file:bg-terminal-accent file:text-terminal hover:file:bg-terminal-accent/80"
+              />
+              
+              {uploadedKnowledge && (
+                <div className="space-y-2">
+                  <Label className="text-terminal-accent font-mono text-xs">
+                    UPLOADED CONTENT PREVIEW
+                  </Label>
+                  <Textarea
+                    value={uploadedKnowledge}
+                    onChange={(e) => setUploadedKnowledge(e.target.value)}
+                    className="bg-terminal-panel border-terminal-border text-terminal-text font-mono text-xs min-h-[150px]"
+                    placeholder="Your uploaded knowledge will appear here..."
+                  />
+                  <p className="text-terminal-text/60 font-mono text-xs">
+                    This content will be included in the agent's knowledge base when you save the configuration.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t-2 border-terminal-border pt-4" />
+
+            {/* Manual Knowledge Entries */}
+            <div className="flex items-center justify-between">
+              <Label className="text-terminal-accent font-mono text-sm">
+                MANUAL KNOWLEDGE ENTRIES
+              </Label>
+              <Button
+                onClick={addKnowledgeEntry}
+                className="bg-terminal-success hover:bg-terminal-success/80 text-terminal font-mono font-semibold"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                ADD ENTRY
+              </Button>
+            </div>
+
+            <div className="space-y-4">
             {knowledge.map((entry, index) => (
               <div
                 key={entry.id}
@@ -345,11 +430,12 @@ const AIConfigPage = () => {
               </div>
             ))}
 
-            {knowledge.length === 0 && (
+            {knowledge.length === 0 && !uploadedKnowledge && (
               <div className="text-center py-12 text-terminal-text/60 font-mono text-sm">
-                No knowledge entries yet. Click "ADD ENTRY" to create one.
+                No knowledge entries yet. Upload a document or click "ADD ENTRY" to create one.
               </div>
             )}
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -65,6 +65,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        terminal: {
+          DEFAULT: "hsl(var(--terminal-bg))",
+          panel: "hsl(var(--terminal-panel))",
+          border: "hsl(var(--terminal-border))",
+          text: "hsl(var(--terminal-text))",
+          accent: "hsl(var(--terminal-accent))",
+          success: "hsl(var(--terminal-success))",
+          danger: "hsl(var(--terminal-danger))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
